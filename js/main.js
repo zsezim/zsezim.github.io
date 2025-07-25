@@ -123,7 +123,26 @@ function drawScatter(xKey, xLabel) {
 
  //const makeAnnotations = d3.annotation().annotations(annotations);
  //svg.append("g").attr("class", "annotation-group").call(makeAnnotations);
-}//
+ // Safe Annotations
+if (filteredData.length > 0) {
+    const annotations = [
+      {
+        note: {
+          label: "Highest deaths",
+          title: filteredData[0].country
+        },
+        x: x(filteredData[0][xKey]),
+        y: y(filteredData[0].deaths),
+        dy: -40,
+        dx: 10
+      }
+    ];
+  
+    const makeAnnotations = d3.annotation().annotations(annotations);
+    svg.append("g").attr("class", "annotation-group").call(makeAnnotations);
+  }
+  
+}
 
 function sceneGDP() {
   selectedX = "gdp";
