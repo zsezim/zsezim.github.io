@@ -107,24 +107,8 @@ function drawScatter(xKey, xLabel) {
     .append("title")
     .text(d => `${d.country}: ${d.deaths.toFixed(1)} deaths`);
 
-  // Annotations
- //const annotations = [
- //  {
- //    note: {
- //      label: "Highest deaths",
- //      title: filteredData[0].country
- //    },
- //    x: x(filteredData[0][xKey]),
- //    y: y(filteredData[0].deaths),
- //    dy: -40,
- //    dx: 10
- //  }
- //];
-
- //const makeAnnotations = d3.annotation().annotations(annotations);
- //svg.append("g").attr("class", "annotation-group").call(makeAnnotations);
- // Safe Annotations
-if (filteredData.length > 0) {
+  // Safe Annotations
+  if (filteredData.length > 0) {
     const annotations = [
       {
         note: {
@@ -137,11 +121,10 @@ if (filteredData.length > 0) {
         dx: 10
       }
     ];
-  
+
     const makeAnnotations = d3.annotation().annotations(annotations);
     svg.append("g").attr("class", "annotation-group").call(makeAnnotations);
   }
-  
 }
 
 function sceneGDP() {
