@@ -158,7 +158,7 @@ function drawScatter(xKey, xLabel) {
 svg.append("g")
   .attr("class", "annotation-group")
   .call(makeAnnotations);
-
+}
 
 function sceneGDP() {
   selectedX = "gdp";
