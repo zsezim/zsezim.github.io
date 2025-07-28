@@ -109,34 +109,57 @@ function drawScatter(xKey, xLabel) {
 
   // Safe Annotations
   // Safe Annotations
-if (filteredData.length > 0) {
-    const maxDeath = d3.max(filteredData, d => d.deaths);
-    const maxCountry = filteredData.find(d => d.deaths === maxDeath);
+
+  const maxCountry = {
+    country: "Peru",
+    deaths: 6601.11,
+    gdp: 12236.71,
+    hdi: 0.77,
+    age: 29.1
+  };
   
-    const annotations = [
-      {
-        note: {
-          label: `${xLabel}: ${maxCountry[xKey].toFixed(2)}`,
-          title: `${maxCountry.country}`
-        },
-        x: x(maxCountry[xKey]),
-        y: y(maxCountry.deaths),
-        dy: -40,
-        dx: 10,
-        subject: { radius: 6 }
-      }
-    ];
+  const minCountry = {
+    country: "Burundi",
+    deaths: 1.13,
+    gdp: 702.23,
+    hdi: 0.43,
+    age: 17.5
+  };
   
-    const makeAnnotations = d3.annotation()
-      .type(d3.annotationLabel)
-      .annotations(annotations);
-  
-    svg.append("g")
-      .attr("class", "annotation-group")
-      .call(makeAnnotations);
-  }
-  
-  
+  const annotations = [
+    {
+      note: {
+        label: `${xLabel}: ${maxCountry[xKey].toFixed(2)}`,
+        title: `${maxCountry.country}`
+      },
+      x: x(maxCountry[xKey]),
+      y: y(maxCountry.deaths),
+      dy: -40,
+      dx: 10,
+      subject: { radius: 6 }
+    },
+    {
+      note: {
+        label: `${xLabel}: ${minCountry[xKey].toFixed(2)}`,
+        title: `${minCountry.country}`
+      },
+      x: x(minCountry[xKey]),
+      y: y(minCountry.deaths),
+      dy: 40,
+      dx: -10,
+      subject: { radius: 6 }
+    }
+  ];
+
+  const makeAnnotations = d3.annotation()
+  .type(d3.annotationLabel)
+  .annotations(annotations);
+
+svg.append("g")
+  .attr("class", "annotation-group")
+  .call(makeAnnotations);
+
+
 function sceneGDP() {
   selectedX = "gdp";
   drawScatter(selectedX, "GDP per Capita ($)");
