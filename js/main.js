@@ -108,25 +108,35 @@ function drawScatter(xKey, xLabel) {
     .text(d => `${d.country}: ${d.deaths.toFixed(1)} deaths`);
 
   // Safe Annotations
-  if (filteredData.length > 0) {
+  // Safe Annotations
+if (filteredData.length > 0) {
+    const maxDeath = d3.max(filteredData, d => d.deaths);
+    const maxCountry = filteredData.find(d => d.deaths === maxDeath);
+  
     const annotations = [
       {
         note: {
-          label: "Highest deaths",
-          title: filteredData[0].country
+          label: `${xLabel}: ${maxCountry[xKey].toFixed(2)}`,
+          title: `${maxCountry.country}`
         },
-        x: x(filteredData[0][xKey]),
-        y: y(filteredData[0].deaths),
+        x: x(maxCountry[xKey]),
+        y: y(maxCountry.deaths),
         dy: -40,
-        dx: 10
+        dx: 10,
+        subject: { radius: 6 }
       }
     ];
-
-    const makeAnnotations = d3.annotation().annotations(annotations);
-    svg.append("g").attr("class", "annotation-group").call(makeAnnotations);
+  
+    const makeAnnotations = d3.annotation()
+      .type(d3.annotationLabel)
+      .annotations(annotations);
+  
+    svg.append("g")
+      .attr("class", "annotation-group")
+      .call(makeAnnotations);
   }
-}
-
+  
+  
 function sceneGDP() {
   selectedX = "gdp";
   drawScatter(selectedX, "GDP per Capita ($)");
