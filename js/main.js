@@ -144,8 +144,8 @@ function drawScatter(xKey, xLabel) {
       },
       x: clamp(x(maxCountry[xKey]), 0, width),
       y: clamp(y(maxCountry.deaths), 0, height),
-      dy: -20,
-      dx: 5,
+      dy: y(maxCountry.deaths) < height / 2 ? 20 : -20,
+      dx: x(maxCountry[xKey]) > width / 2 ? -30 : 30,
       subject: { radius: 6 }
     },
     {
@@ -155,11 +155,12 @@ function drawScatter(xKey, xLabel) {
       },
       x: clamp(x(minCountry[xKey]), 0, width),
       y: clamp(y(minCountry.deaths), 0, height),
-      dy: 20,
-      dx: -5,
+      dy: y(minCountry.deaths) < height / 2 ? 20 : -20,
+      dx: x(minCountry[xKey]) > width / 2 ? -30 : 30,
       subject: { radius: 6 }
     }
   ];
+  
 
   const makeAnnotations = d3.annotation()
     .type(d3.annotationLabel)
