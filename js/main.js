@@ -1,4 +1,5 @@
 // Parameters
+console.log("main.js loaded");
 let currentScene = 0;
 let selectedX = "gdp"; // exploration scene parameter
 let covidData;
