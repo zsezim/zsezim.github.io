@@ -4,6 +4,7 @@ let selectedX = "gdp"; // exploration scene parameter
 let covidData;
 
 const scenes = [sceneIntro, sceneGDP, sceneHDI, sceneAge, sceneExplore];
+const clamp = (val, min, max) => Math.max(min, Math.min(val, max));
 
 // Load data and render the first scene
 d3.csv("data/owid-covid-data.csv").then(data => {
