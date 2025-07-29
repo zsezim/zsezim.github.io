@@ -144,8 +144,8 @@ function drawScatter(xKey, xLabel) {
       },
       x: clamp(x(maxCountry[xKey]), 0, width),
       y: clamp(y(maxCountry.deaths), 0, height),
-      dy: -40,
-      dx: 10,
+      dy: -20,
+      dx: 5,
       subject: { radius: 6 }
     },
     {
@@ -155,8 +155,8 @@ function drawScatter(xKey, xLabel) {
       },
       x: clamp(x(minCountry[xKey]), 0, width),
       y: clamp(y(minCountry.deaths), 0, height),
-      dy: 40,
-      dx: -10,
+      dy: 20,
+      dx: -5,
       subject: { radius: 6 }
     }
   ];
