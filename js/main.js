@@ -153,7 +153,7 @@ function drawScatter(xKey, xLabel) {
       x: x(minCountry[xKey]),
       y: y(minCountry.deaths),
       dy: 20,
-      dx: -5,
+      dx: 5,
       subject: { radius: 6 }
     }
   ];
