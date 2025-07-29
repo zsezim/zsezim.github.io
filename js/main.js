@@ -4,7 +4,6 @@ let selectedX = "gdp"; // exploration scene parameter
 let covidData;
 
 const scenes = [sceneIntro, sceneGDP, sceneHDI, sceneAge, sceneExplore];
-const clamp = (val, min, max) => Math.max(min, Math.min(val, max));
 
 // Load data and render the first scene
 d3.csv("data/owid-covid-data.csv").then(data => {
@@ -140,8 +139,6 @@ function drawScatter(xKey, xLabel) {
         label: `${xLabel}: ${maxCountry[xKey].toFixed(2)}`,
         title: `${maxCountry.country}`
       },
-      //x: clamp(x(maxCountry[xKey]), 0, width),
-      //y: clamp(y(maxCountry.deaths), 0, height),
       x: x(maxCountry[xKey]),
       y: y(maxCountry.deaths),
       dy: -40,
@@ -153,8 +150,6 @@ function drawScatter(xKey, xLabel) {
         label: `${xLabel}: ${minCountry[xKey].toFixed(2)}`,
         title: `${minCountry.country}`
       },
-      //x: clamp(x(minCountry[xKey]), 0, width),
-      //y: clamp(y(minCountry.deaths), 0, height),
       x: x(minCountry[xKey]),
       y: y(minCountry.deaths),
       dy: 40,
@@ -162,7 +157,6 @@ function drawScatter(xKey, xLabel) {
       subject: { radius: 6 }
     }
   ];
-  
 
   const makeAnnotations = d3.annotation()
     .type(d3.annotationLabel)
