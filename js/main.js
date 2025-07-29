@@ -144,8 +144,8 @@ function drawScatter(xKey, xLabel) {
       },
       x: clamp(x(maxCountry[xKey]), 0, width),
       y: clamp(y(maxCountry.deaths), 0, height),
-      dy: y(maxCountry.deaths) < height / 2 ? 20 : -20,
-      dx: x(maxCountry[xKey]) > width / 2 ? -30 : 30,
+      dy: -40,
+      dx: 10,
       subject: { radius: 6 }
     },
     {
