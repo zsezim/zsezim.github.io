@@ -66,7 +66,7 @@ function sceneIntro() {
 
 // Scatterplot generator with annotations
 function drawScatter(xKey, xLabel) {
-  const margin = { top: 50, right: 50, bottom: 60, left: 80 };
+  const margin = { top: 80, right: 100, bottom: 80, left: 100 };
   const width = 800 - margin.left - margin.right;
   const height = 500 - margin.top - margin.bottom;
 
