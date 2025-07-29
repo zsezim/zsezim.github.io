@@ -140,9 +140,10 @@ function drawScatter(xKey, xLabel) {
         label: `${xLabel}: ${maxCountry[xKey].toFixed(2)}`,
         title: `${maxCountry.country}`
       },
-      x: clamp(x(maxCountry[xKey]), 0, width),
-      y: clamp(y(maxCountry.deaths), 0, height),
-
+      //x: clamp(x(maxCountry[xKey]), 0, width),
+      //y: clamp(y(maxCountry.deaths), 0, height),
+      x: x(maxCountry[xKey]),
+      y: y(maxCountry.deaths),
       dy: -40,
       dx: 10,
       subject: { radius: 6 }
@@ -152,8 +153,10 @@ function drawScatter(xKey, xLabel) {
         label: `${xLabel}: ${minCountry[xKey].toFixed(2)}`,
         title: `${minCountry.country}`
       },
-      x: clamp(x(minCountry[xKey]), 0, width),
-      y: clamp(y(minCountry.deaths), 0, height),
+      //x: clamp(x(minCountry[xKey]), 0, width),
+      //y: clamp(y(minCountry.deaths), 0, height),
+      x: x(minCountry[xKey]),
+      y: y(minCountry.deaths),
       dy: 40,
       dx: -10,
       subject: { radius: 6 }
