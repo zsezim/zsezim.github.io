@@ -26,6 +26,11 @@ d3.csv("data/owid-covid-data.csv").then(data => {
 function renderScene(index) {
   d3.select("#viz").html("");
   d3.select("#scene-title").text(sceneTitles[index]);
+  if (index >= 1 && index <= 3) {
+    d3.select("#scene-subtitle").text("Peru: Highest Covid Deaths Per Million; Burundi: Lowest Covid Deaths Per Million");
+  } else {
+    d3.select("#scene-subtitle").text("");
+  }
   scenes[index]();
 }
 
