@@ -209,8 +209,7 @@ function drawCountryFocusedScatter(xKey, xLabel, highlightCountry) {
       const annotation = [
         {
           note: {
-            title: selected.country,
-            label: `${xLabel}: ${selected[xKey].toFixed(2)}\nDeaths: ${selected.deaths.toFixed(1)}`
+            title: selected.country
           },
           x: x(selected[xKey]),
           y: y(selected.deaths),
@@ -226,6 +225,7 @@ function drawCountryFocusedScatter(xKey, xLabel, highlightCountry) {
 
       svg.append("g")
         .attr("class", "annotation-group")
+        .attr("fill", "red")
         .call(makeAnnotations);
 
       d3.select("#countryStats").html(`
