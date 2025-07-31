@@ -113,6 +113,44 @@ function drawScatter(xKey, xLabel) {
     .attr("fill", "steelblue")
     .append("title")
     .text(d => `${d.country}: ${d.deaths.toFixed(1)} deaths`);
+
+  const peru = filteredData.find(d => d.country === "Peru");
+  const burundi = filteredData.find(d => d.country === "Burundi");
+
+  const annotations = [];
+  if (peru) {
+    annotations.push({
+      note: { title: "Peru" },
+      x: x(peru[xKey]),
+      y: y(peru.deaths),
+      dx: 20,
+      dy: -30,
+      subject: { radius: 6 }
+    });
+  }
+  if (burundi) {
+    annotations.push({
+      note: { title: "Burundi" },
+      x: x(burundi[xKey]),
+      y: y(burundi.deaths),
+      dx: -20,
+      dy: 30,
+      subject: { radius: 6 }
+    });
+  }
+
+  if (annotations.length > 0) {
+    const makeAnnotations = d3.annotation()
+      .type(d3.annotationLabel)
+      .annotations(annotations);
+
+    svg.append("g")
+      .attr("class", "annotation-group")
+      .style("pointer-events", "none")
+      .attr("stroke", "red")
+      .attr("fill", "red")
+      .call(makeAnnotations);
+  }
 }
 
 function sceneGDP() {
@@ -205,11 +243,12 @@ function drawCountryFocusedScatter(xKey, xLabel, highlightCountry) {
 
   if (highlightCountry) {
     const selected = filteredData.find(d => d.country === highlightCountry);
+
     if (!selected) {
       d3.select("#countryStats").html(`<p><strong>No data available for this country</strong></p>`);
       return;
     }
-    
+
     if (selected) {
       const annotation = [
         {
