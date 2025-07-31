@@ -58,7 +58,7 @@ function sceneIntro() {
     .attr("y", d => y(d.country))
     .attr("width", d => x(d.deaths))
     .attr("height", y.bandwidth())
-    .attr("fill", "crimson");
+    .attr("fill", "steelblue");
 
   g.append("g").call(d3.axisLeft(y));
   g.append("g").attr("transform", `translate(0, 400)`).call(d3.axisBottom(x));
