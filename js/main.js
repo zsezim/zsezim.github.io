@@ -65,8 +65,8 @@ function sceneIntro() {
 }
 
 // Scatterplot generator with annotations
-function drawScatter(xKey, xLabel) {
-  const margin = { top: 80, right: 100, bottom: 80, left: 100 };
+function drawCountryFocusedScatter(xKey, xLabel, highlightCountry) {
+  const margin = { top: 60, right: 100, bottom: 60, left: 80 };
   const width = 800 - margin.left - margin.right;
   const height = 500 - margin.top - margin.bottom;
 
@@ -86,14 +86,9 @@ function drawScatter(xKey, xLabel) {
     .domain(d3.extent(filteredData, d => d.deaths)).nice()
     .range([height, 0]);
 
-  // Axes
-  svg.append("g")
-    .attr("transform", `translate(0,${height})`)
-    .call(d3.axisBottom(x));
-  svg.append("g")
-    .call(d3.axisLeft(y));
+  svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
+  svg.append("g").call(d3.axisLeft(y));
 
-  // Axis labels
   svg.append("text")
     .attr("x", width / 2)
     .attr("y", height + 40)
@@ -107,17 +102,46 @@ function drawScatter(xKey, xLabel) {
     .attr("text-anchor", "middle")
     .text("COVID-19 Deaths per Million");
 
-  // Scatter dots
+  // Draw all dots
   svg.selectAll("circle")
     .data(filteredData)
     .enter()
     .append("circle")
     .attr("cx", d => x(d[xKey]))
     .attr("cy", d => y(d.deaths))
-    .attr("r", 5)
-    .attr("fill", "steelblue")
+    .attr("r", d => d.country === highlightCountry ? 8 : 4)
+    .attr("fill", d => d.country === highlightCountry ? "orangered" : "steelblue")
+    .attr("opacity", d => d.country === highlightCountry ? 1 : 0.6)
     .append("title")
     .text(d => `${d.country}: ${d.deaths.toFixed(1)} deaths`);
+
+  // Optional: add annotation for highlighted country
+  if (highlightCountry) {
+    const selected = filteredData.find(d => d.country === highlightCountry);
+    if (selected) {
+      const annotation = [
+        {
+          note: {
+            title: selected.country,
+            label: `${xLabel}: ${selected[xKey].toFixed(2)}\nDeaths: ${selected.deaths.toFixed(1)}`
+          },
+          x: x(selected[xKey]),
+          y: y(selected.deaths),
+          dx: 20,
+          dy: -30,
+          subject: { radius: 6 }
+        }
+      ];
+
+      const makeAnnotations = d3.annotation()
+        .type(d3.annotationLabel)
+        .annotations(annotation);
+
+      svg.append("g").call(makeAnnotations);
+    }
+  }
+}
+
 
   // Hardcoded annotation points
   const maxCountry = {
@@ -169,7 +193,7 @@ function drawScatter(xKey, xLabel) {
   svg.append("g")
     .attr("class", "annotation-group")
     .call(makeAnnotations);
-}
+
 
 // Scene 2: GDP scatterplot
 function sceneGDP() {
@@ -193,37 +217,28 @@ function sceneAge() {
 function sceneExplore() {
   const container = d3.select("#viz");
 
+  // Country dropdown
   container.append("label")
-    .text("Compare against: ")
+    .text("Select a country: ")
     .append("select")
-    .attr("id", "xSelect")
+    .attr("id", "countrySelect")
     .selectAll("option")
-    .data(["gdp", "hdi", "age"])
+    .data(covidData.filter(d => d.deaths)) // Only countries with data
     .enter()
     .append("option")
-    .attr("value", d => d)
-    .text(d => ({
-      gdp: "GDP per Capita ($)",
-      hdi: "Human Development Index",
-      age: "Median Age"
-    }[d]));
+    .attr("value", d => d.country)
+    .text(d => d.country);
 
-  drawScatter(selectedX, {
-    gdp: "GDP per Capita ($)",
-    hdi: "Human Development Index",
-    age: "Median Age"
-  }[selectedX]);
+  // Show GDP scatter as default, or allow dropdown to switch variables if needed
+  drawCountryFocusedScatter("gdp", "GDP per Capita ($)", null);
 
-  d3.select("#xSelect").on("change", function () {
-    selectedX = this.value;
+  d3.select("#countrySelect").on("change", function () {
+    const selectedCountry = this.value;
     d3.select("svg").remove();
-    drawScatter(selectedX, {
-      gdp: "GDP per Capita ($)",
-      hdi: "Human Development Index",
-      age: "Median Age"
-    }[selectedX]);
+    drawCountryFocusedScatter("gdp", "GDP per Capita ($)", selectedCountry);
   });
 }
+  
 
 // Navigation buttons
 d3.select("#next").on("click", () => {
