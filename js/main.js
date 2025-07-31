@@ -67,6 +67,15 @@ function sceneIntro() {
 
   g.append("g").call(d3.axisLeft(y));
   g.append("g").attr("transform", `translate(0, 400)`).call(d3.axisBottom(x));
+
+   // X-axis label
+  g.append("text")
+  .attr("x", 300)
+  .attr("y", 440)
+  .attr("text-anchor", "middle")
+  .attr("font-size", "14px")
+  .text("Number of COVID-19 Deaths per Million");
+
 }
 
 function drawScatter(xKey, xLabel) {
