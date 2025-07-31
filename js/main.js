@@ -6,9 +6,9 @@ const scenes = [sceneIntro, sceneGDP, sceneHDI, sceneAge, sceneExplore];
 
 const sceneTitles = [
   "Top 10 Countries by COVID-19 Deaths",
-  "Deaths vs. GDP per Capita",
-  "Deaths vs. Human Development Index",
-  "Deaths vs. Median Age",
+  "Number of Covid Deaths vs. GDP per Capita",
+  "Number of Covid Deaths vs. Human Development Index",
+  "Number of Covid Deaths vs. Median Age",
   "Explore Individual Countries"
 ];
 
