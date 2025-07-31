@@ -1,14 +1,17 @@
-// Parameters
 console.log("main.js loaded");
+// Parameters
 let currentScene = 0;
-let selectedX = "gdp"; // exploration scene parameter
 let covidData;
-
 const scenes = [sceneIntro, sceneGDP, sceneHDI, sceneAge, sceneExplore];
-const clamp = (val, min, max) => Math.max(min, Math.min(val, max));
 
+const sceneTitles = [
+  "Top 10 Countries by COVID-19 Deaths",
+  "Deaths vs. GDP per Capita",
+  "Deaths vs. Human Development Index",
+  "Deaths vs. Median Age",
+  "Explore Individual Countries"
+];
 
-// Load data and render the first scene
 d3.csv("data/owid-covid-data.csv").then(data => {
   covidData = data.map(d => ({
     country: d.location,
@@ -20,13 +23,12 @@ d3.csv("data/owid-covid-data.csv").then(data => {
   renderScene(currentScene);
 });
 
-// Scene renderer
 function renderScene(index) {
   d3.select("#viz").html("");
+  d3.select("#scene-title").text(sceneTitles[index]);
   scenes[index]();
 }
 
-// Scene 1: Intro bar chart
 function sceneIntro() {
   const svg = d3.select("#viz").append("svg")
     .attr("width", 800)
@@ -59,12 +61,99 @@ function sceneIntro() {
     .attr("fill", "crimson");
 
   g.append("g").call(d3.axisLeft(y));
-  g.append("g")
-    .attr("transform", `translate(0, 400)`)
-    .call(d3.axisBottom(x));
+  g.append("g").attr("transform", `translate(0, 400)`).call(d3.axisBottom(x));
 }
 
-// Scatterplot generator with annotations
+function drawScatter(xKey, xLabel) {
+  const margin = { top: 50, right: 50, bottom: 60, left: 80 };
+  const width = 800 - margin.left - margin.right;
+  const height = 500 - margin.top - margin.bottom;
+
+  const svg = d3.select("#viz").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const filteredData = covidData.filter(d => d.deaths && d[xKey]);
+
+  const x = d3.scaleLinear()
+    .domain(d3.extent(filteredData, d => d[xKey])).nice()
+    .range([0, width]);
+
+  const y = d3.scaleLinear()
+    .domain(d3.extent(filteredData, d => d.deaths)).nice()
+    .range([height, 0]);
+
+  svg.append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x));
+  svg.append("g").call(d3.axisLeft(y));
+
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", height + 40)
+    .attr("text-anchor", "middle")
+    .text(xLabel);
+
+  svg.append("text")
+    .attr("x", -height / 2)
+    .attr("y", -50)
+    .attr("transform", "rotate(-90)")
+    .attr("text-anchor", "middle")
+    .text("COVID-19 Deaths per Million");
+
+  svg.selectAll("circle")
+    .data(filteredData)
+    .enter()
+    .append("circle")
+    .attr("cx", d => x(d[xKey]))
+    .attr("cy", d => y(d.deaths))
+    .attr("r", 5)
+    .attr("fill", "steelblue")
+    .append("title")
+    .text(d => `${d.country}: ${d.deaths.toFixed(1)} deaths`);
+}
+
+function sceneGDP() {
+  drawScatter("gdp", "GDP per Capita ($)");
+}
+
+function sceneHDI() {
+  drawScatter("hdi", "Human Development Index");
+}
+
+function sceneAge() {
+  drawScatter("age", "Median Age");
+}
+
+function sceneExplore() {
+  const container = d3.select("#viz");
+
+  container.append("label")
+    .attr("for", "countrySelect")
+    .text("Select a country: ");
+
+  container.append("select")
+    .attr("id", "countrySelect")
+    .selectAll("option")
+    .data(covidData.filter(d => d.deaths))
+    .enter()
+    .append("option")
+    .attr("value", d => d.country)
+    .text(d => d.country);
+
+  container.append("div").attr("id", "countryStats");
+  drawCountryFocusedScatter("gdp", "GDP per Capita ($)", null);
+
+  d3.select("#countrySelect").on("change", function () {
+    const selectedCountry = this.value;
+    d3.select("svg").remove();
+    d3.select("#countryStats").html("");
+    drawCountryFocusedScatter("gdp", "GDP per Capita ($)", selectedCountry);
+  });
+}
+
 function drawCountryFocusedScatter(xKey, xLabel, highlightCountry) {
   const margin = { top: 60, right: 100, bottom: 60, left: 80 };
   const width = 800 - margin.left - margin.right;
@@ -102,7 +191,6 @@ function drawCountryFocusedScatter(xKey, xLabel, highlightCountry) {
     .attr("text-anchor", "middle")
     .text("COVID-19 Deaths per Million");
 
-  // Draw all dots
   svg.selectAll("circle")
     .data(filteredData)
     .enter()
@@ -115,7 +203,6 @@ function drawCountryFocusedScatter(xKey, xLabel, highlightCountry) {
     .append("title")
     .text(d => `${d.country}: ${d.deaths.toFixed(1)} deaths`);
 
-  // Optional: add annotation for highlighted country
   if (highlightCountry) {
     const selected = filteredData.find(d => d.country === highlightCountry);
     if (selected) {
@@ -137,108 +224,20 @@ function drawCountryFocusedScatter(xKey, xLabel, highlightCountry) {
         .type(d3.annotationLabel)
         .annotations(annotation);
 
-      svg.append("g").call(makeAnnotations);
+      svg.append("g")
+        .attr("class", "annotation-group")
+        .call(makeAnnotations);
+
+      d3.select("#countryStats").html(`
+        <h3>${selected.country}</h3>
+        <p><strong>GDP per Capita:</strong> $${selected.gdp.toFixed(2)}</p>
+        <p><strong>HDI:</strong> ${selected.hdi.toFixed(2)}</p>
+        <p><strong>Median Age:</strong> ${selected.age}</p>
+        <p><strong>Deaths per Million:</strong> ${selected.deaths.toFixed(1)}</p>
+      `);
     }
   }
 }
-
-
-  // Hardcoded annotation points
-  const maxCountry = {
-    country: "Peru",
-    deaths: 6601.11,
-    gdp: 12236.71,
-    hdi: 0.77,
-    age: 29.1
-  };
-
-  const minCountry = {
-    country: "Burundi",
-    deaths: 1.13,
-    gdp: 702.23,
-    hdi: 0.43,
-    age: 17.5
-  };
-
-  const annotations = [
-    {
-      note: {
-        label: `${xLabel}: ${maxCountry[xKey].toFixed(2)}`,
-        title: `${maxCountry.country}`
-      },
-      x: clamp(x(maxCountry[xKey]), 0, width),
-      y: clamp(y(maxCountry.deaths), 0, height),
-      dy: -40,
-      dx: 10,
-      subject: { radius: 6 }
-    },
-    {
-      note: {
-        label: `${xLabel}: ${minCountry[xKey].toFixed(2)}`,
-        title: `${minCountry.country}`
-      },
-      x: clamp(x(minCountry[xKey]), 0, width),
-      y: clamp(y(minCountry.deaths), 0, height),
-      dy: y(minCountry.deaths) < height / 2 ? 20 : -20,
-      dx: x(minCountry[xKey]) > width / 2 ? -30 : 30,
-      subject: { radius: 6 }
-    }
-  ];
-  
-
-  const makeAnnotations = d3.annotation()
-    .type(d3.annotationLabel)
-    .annotations(annotations);
-
-  svg.append("g")
-    .attr("class", "annotation-group")
-    .call(makeAnnotations);
-
-
-// Scene 2: GDP scatterplot
-function sceneGDP() {
-  selectedX = "gdp";
-  drawScatter(selectedX, "GDP per Capita ($)");
-}
-
-// Scene 3: HDI scatterplot
-function sceneHDI() {
-  selectedX = "hdi";
-  drawScatter(selectedX, "Human Development Index");
-}
-
-// Scene 4: Age scatterplot
-function sceneAge() {
-  selectedX = "age";
-  drawScatter(selectedX, "Median Age");
-}
-
-// Scene 5: Interactive exploration
-function sceneExplore() {
-  const container = d3.select("#viz");
-
-  // Country dropdown
-  container.append("label")
-    .text("Select a country: ")
-    .append("select")
-    .attr("id", "countrySelect")
-    .selectAll("option")
-    .data(covidData.filter(d => d.deaths)) // Only countries with data
-    .enter()
-    .append("option")
-    .attr("value", d => d.country)
-    .text(d => d.country);
-
-  // Show GDP scatter as default, or allow dropdown to switch variables if needed
-  drawCountryFocusedScatter("gdp", "GDP per Capita ($)", null);
-
-  d3.select("#countrySelect").on("change", function () {
-    const selectedCountry = this.value;
-    d3.select("svg").remove();
-    drawCountryFocusedScatter("gdp", "GDP per Capita ($)", selectedCountry);
-  });
-}
-  
 
 // Navigation buttons
 d3.select("#next").on("click", () => {
