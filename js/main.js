@@ -225,6 +225,8 @@ function drawCountryFocusedScatter(xKey, xLabel, highlightCountry) {
 
       svg.append("g")
         .attr("class", "annotation-group")
+        .style("pointer-events", "none")
+        .attr("stroke", "red")
         .attr("fill", "red")
         .call(makeAnnotations);
 
