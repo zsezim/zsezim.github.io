@@ -205,6 +205,11 @@ function drawCountryFocusedScatter(xKey, xLabel, highlightCountry) {
 
   if (highlightCountry) {
     const selected = filteredData.find(d => d.country === highlightCountry);
+    if (!selected) {
+      d3.select("#countryStats").html(`<p><strong>No data available for this country</strong></p>`);
+      return;
+    }
+    
     if (selected) {
       const annotation = [
         {
